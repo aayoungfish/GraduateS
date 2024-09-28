@@ -1,0 +1,120 @@
+---
+title: "Combat_get_tpm_count"
+author: "ZRL"
+date: "2024-03-06"
+output: 
+  html_document:
+    toc: yes
+---
+
+## Package
+```{r,message=FALSE,warning=FALSE}
+library(sva)
+```
+
+## Get combat count csv 
+```{r,message=FALSE,warning=FALSE}
+setwd("E:/task/brtime/rnaseq/")
+count <- read.csv("./gene_count_matrix.csv",row.names = 1)
+rawdata1 <- count[,c(1:7,15:21,29:42,8:14,22:28)] # 修改顺序，改成0 1 3 6 12 24h(rep1-rep9)
+sample <- colnames(rawdata1)
+type <- c(rep("0h",7),rep("1h",7),rep("3h",7),rep("6h",7),rep("12h",7),rep("24h",7))
+batch <- c(rep("batch1",3),"batch2",rep("batch3",3),
+           rep("batch1",3),"batch2",rep("batch3",3),
+           rep("batch1",3),"batch2",rep("batch3",3),
+           rep("batch1",3),"batch2",rep("batch3",3),
+           rep("batch1",3),"batch2",rep("batch3",3),
+           rep("batch1",3),"batch2",rep("batch3",3))
+data <- data.frame(sample,type,batch)
+rownames(data) <- data$sample
+model <- model.matrix(~as.factor(data$type))
+combat_Expr0 <- ComBat(dat=rawdata1, batch = data$batch, mod = model)
+write.csv(combat_Expr0,"./combat_count_allrep.csv")
+combat_Expr <- combat_Expr0[,c(1:3,9,12,14,19:21,25,27,28,29:31,40:42)] # 123 279 789 489 123 789
+write.csv(combat_Expr,"./combat_count_6h489.csv")
+```
+## Get combat tpm csv 
+```{r,message=FALSE,warning=FALSE}
+setwd("E:/task/brtime/rnaseq/")
+tpm <- read.csv("./gene_tpm_matrix.csv",row.names = 1)
+rawdata1 <- tpm[,c(1:7,15:21,29:42,8:14,22:28)] # 修改顺序，改成0 1 3 6 12 24h(rep1-rep9)
+sample <- colnames(rawdata1)
+type <- c(rep("0h",7),rep("1h",7),rep("3h",7),rep("6h",7),rep("12h",7),rep("24h",7))
+batch <- c(rep("batch1",3),"batch2",rep("batch3",3),
+           rep("batch1",3),"batch2",rep("batch3",3),
+           rep("batch1",3),"batch2",rep("batch3",3),
+           rep("batch1",3),"batch2",rep("batch3",3),
+           rep("batch1",3),"batch2",rep("batch3",3),
+           rep("batch1",3),"batch2",rep("batch3",3))
+data <- data.frame(sample,type,batch)
+rownames(data) <- data$sample
+model <- model.matrix(~as.factor(data$type))
+combat_Expr0 <- ComBat(dat=rawdata1, batch = data$batch, mod = model)
+write.csv(combat_Expr0,"./combat_tpm_allrep.csv")
+combat_Expr <- combat_Expr0[,c(1:3,9,12,14,19:21,25,27,28,29:31,40:42)] # 123 279 789 489 123 789
+write.csv(combat_Expr,"./combat_tpm_6h489.csv")
+```
+
+## srna - count
+```{r,message=FALSE,warning=FALSE}
+rawdata <- read.csv("E:/task/shortstack/Counts1.txt",sep="\t",row.names = 1)
+rownames(rawdata) <- rawdata$Name
+rawdata1 <- rawdata[,c(4:39)]
+rawdata1 <- rawdata1[,c(19:21,1:3,22:24,4:6,25:27,7:9,28:30,10:12,31:33,13:15,34:36,16:18)] # 修改顺序，改成0 1 3 6 12 24h(rep1-rep3,rep7-9)
+sample <- colnames(rawdata1)
+type <- c(rep("0h",6),rep("1h",6),rep("3h",6),rep("6h",6),rep("12h",6),rep("24h",6))
+batch <- c(rep("batch1",3),rep("batch3",3),
+           rep("batch1",3),rep("batch3",3),
+           rep("batch1",3),rep("batch3",3),
+           rep("batch1",3),rep("batch3",3),
+           rep("batch1",3),rep("batch3",3),
+           rep("batch1",3),rep("batch3",3))
+data <- data.frame(sample,type,batch)
+rownames(data) <- data$sample
+model <- model.matrix(~as.factor(data$type))
+combat_Expr0 <- ComBat(dat=rawdata1, batch = data$batch, mod = model)
+#combat_Expr0 <- combat_Expr0[rowSums(combat_Expr0) > 36 & apply(combat_Expr0,1,function(x){ all(x>0)}),]
+write.csv(combat_Expr0,"E:/task/brtime/srna/combat_count_allrep_srna.csv")
+combat_Expr <- combat_Expr0[,c(1:3,10:12,15,17,18,22:24,28:30,32,33,35)] #  # 123 789 389 789 789 238
+write.csv(combat_Expr,"E:/task/brtime/srna/combat_count_123789389789789238_srna.csv")
+```
+## srna - rpm
+```{r,message=FALSE,warning=FALSE}
+rawdata <- read.csv("E:/task/shortstack/all_sample_rpm.csv")
+rownames(rawdata) <- rawdata$Name
+#rawdata1 <- rawdata[,c(4:39)]
+rawdata1 <- rawdata[,c(19:21,1:3,22:24,4:6,25:27,7:9,28:30,10:12,31:33,13:15,34:36,16:18)] # 修改顺序，改成0 1 3 6 12 24h(rep1-rep3,rep7-9)
+sample <- colnames(rawdata1)
+type <- c(rep("0h",6),rep("1h",6),rep("3h",6),rep("6h",6),rep("12h",6),rep("24h",6))
+batch <- c(rep("batch1",3),rep("batch3",3),
+           rep("batch1",3),rep("batch3",3),
+           rep("batch1",3),rep("batch3",3),
+           rep("batch1",3),rep("batch3",3),
+           rep("batch1",3),rep("batch3",3),
+           rep("batch1",3),rep("batch3",3))
+data <- data.frame(sample,type,batch)
+rownames(data) <- data$sample
+model <- model.matrix(~as.factor(data$type))
+combat_Expr0 <- ComBat(dat=rawdata1, batch = data$batch, mod = model)
+#combat_Expr0 <- combat_Expr0[rowSums(combat_Expr0) > 36 & apply(combat_Expr0,1,function(x){ all(x>0)}),]
+write.csv(combat_Expr0,"E:/task/brtime/srna/combat_tpm_allrep_srna.csv")
+combat_Expr <- combat_Expr0[,c(1:3,10:12,15,17,18,22:24,28:30,32,33,35)] #  # 123 789 389 789 789 238
+write.csv(combat_Expr,"E:/task/brtime/srna/combat_tpm_123789389789789238_srna.csv")
+
+```
+## srna-mutant-count
+```{r,message=FALSE,warning=FALSE}
+rawdata <- read.csv("E:/task/shortstack/Counts1.txt",sep="\t",row.names = 1)
+rownames(rawdata) <- rawdata$Name
+rawdata1 <- rawdata[,c(40:63)]
+write.csv(rawdata1,"E:/task/mutant/srna/srna_mutant_count.csv")
+```
+
+## srna-mutant-rpm
+```{r,message=FALSE,warning=FALSE}
+rawdata <- read.csv("E:/task/shortstack/all_sample_rpm.csv")
+rownames(rawdata) <- rawdata$Name
+rawdata1 <- rawdata[,c(37:60)]
+write.csv(rawdata1,"E:/task/mutant/srna/srna_mutant_rpm.csv")
+```
+
